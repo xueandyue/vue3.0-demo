@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
+import { isAuthenticated } from '@/utils/auth'
+
 const routes = [
   {
     path: '/',
@@ -15,26 +17,9 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   },
   {
-    path: '/jie',
-    name: 'test',
-    meta: {
-      title: '查找打卡接龙缺的人'
-    },
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "test" */ '../views/Jielong.vue')
-  },
-  {
     path: '/login',
-    name: 'login',
-    meta: {
-      title: '登录'
-    },
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "login" */ '../views/Login.vue')
+    name: 'Login',
+    component: () => import('@/views/Login.vue')
   }
 ]
 
@@ -43,6 +28,24 @@ const router = createRouter({
   routes
 })
 
+// 全局前置守卫
+router.beforeEach(async (to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    // 需要登录的路由
+    const isAuth = await isAuthenticated()
+    if (!isAuth) {
+      // 未登录或 token 无效，重定向到登录页
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath }  // 保存原本要去的路径
+      })
+    } else {
+      next()  // 已登录且 token 有效，允许访问
+    }
+  } else {
+    next()  // 不需要登录的路由，直接访问
+  }
+})
 
 // 判断是否有token
 function checkToken(){
@@ -80,7 +83,5 @@ router.beforeEach((to,from, next)=>{
   }
   
 })
-
-
 
 export default router

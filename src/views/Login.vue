@@ -16,9 +16,11 @@
 // @ is an alias to /src
 
 import axios from "axios";
-import { reactive } from "vue";
+import { reactive, onMounted } from "vue";
 import qs from "qs";
 import { useRouter } from 'vue-router';
+import { setToken, isAuthenticated } from '@/utils/auth';
+
 export default {
   // name: "Jielong",
   // components: {},
@@ -28,28 +30,32 @@ export default {
       password: "123456",
     });
     const router = useRouter();
+
+    // 检查是否已登录
+    onMounted(async () => {
+      if (await isAuthenticated()) {
+        goto();
+      }
+    });
+
     function goto(){
       router.push("/jie");
     }
  
-    const login = () => {
-      //表单提交
-      axios.post("/session/token.php", qs.stringify(Form)).then((res) => {
+    const login = async () => {
+      try {
+        //表单提交
+        const res = await axios.post("/login.php", qs.stringify(Form));
         const data = res.data;
         if(data.code === '200'){
-            localStorage.token = data.token;
+            setToken(data.token);  // 使用工具函数设置 token
             goto();
-
-
-          
         }else{
-            alert('错误');
+            alert('登录失败：' + (data.message || '未知错误'));
         }
-      });
-
-
-    
- 
+      } catch (error) {
+        alert('登录失败：' + (error.message || '网络错误'));
+      }
     };
 
     return {

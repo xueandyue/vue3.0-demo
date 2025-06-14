@@ -5,7 +5,7 @@ module.exports = {
       port: 8888,
       https: false,
       open: true,
-      disableHostCheck: true,
+      allowedHosts: 'all',  // This replaces disableHostCheck
       // 设置代理
       proxy: {
         "/session": {
@@ -28,7 +28,6 @@ module.exports = {
             changeOrigin: true,
             ws: true,
           },
-          
       },
     },
   };
