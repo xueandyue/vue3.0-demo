@@ -39,13 +39,13 @@ export default {
     });
 
     function goto(){
-      router.push("/jie");
+      router.push("/");
     }
  
     const login = async () => {
       try {
         //表单提交
-        const res = await axios.post("/login.php", qs.stringify(Form));
+        const res = await axios.post("/api/login", qs.stringify(Form));
         const data = res.data;
         if(data.code === '200'){
             setToken(data.token);  // 使用工具函数设置 token

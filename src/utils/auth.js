@@ -23,7 +23,7 @@ export async function validateToken() {
 
   try {
     // 向服务端发送请求验证 token
-    const response = await axios.post('/validate_token', {
+    const response = await axios.post('/api/validate_token', {
       token: token
     })
     
